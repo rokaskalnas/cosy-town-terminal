@@ -98,3 +98,80 @@ def draw():
     print("Commands: select x y | build house/shop/hotel/park | upgrade | help | quit")
 
 def select_plot(x, y):
+    global selected
+    if 0 <= x < size and 0 <= y < size:
+        selected = (x, y)
+        print(f"Selected plot ({x}, {y}).")
+    else
+        print("That plot is outside the grid.")
+
+def start_building(kind):
+    global materials
+
+    if selected is None:
+        print("Select an empty plot first.")
+        return
+    if kind not in buildings:
+        print("That building type doesn't exist.")
+        return
+
+    x, y = selected
+    if grid[y][x] is not None:
+        print("That plot is already occupied.")
+        return
+    if kind == "shop" and population < 10:
+        print("Shops unlock at 10 permanent residents.")
+        return
+    if kind == "hotel" and population < 30:
+        print("Hotel unlocks at 30 permanent residents.")
+        return
+    if count_buildings("shop") == 0:
+        print("Build a shop before building a hotel.")
+        return
+    if kind == "park" and count_buildings("hotel") == 0:
+        print("Build a hotel before building a park.")
+        return
+
+    cost = buildings[kind]["cost"]
+    if materials < cost:
+        print(f"You need {cost} materials to start a {kind}.")
+        return
+
+    materials -= cost
+    grid[y][x] = {
+        "type": kind,
+        "work": 0,
+        "needed": buildings[kind]["work"],
+        "done": False,
+    }
+    print(f"{kind.title()} started. Type words to build it!")
+
+def complete_building(plot):
+    global population, size, grid
+
+    plot["done"] = True
+    kind = plot["type"]
+    print(f"{kind.title()} complete!")
+
+    if kind == "house":
+        residents = random.randint(2, 6)
+        population += residents
+        print(f"{residents} residents moved in.")
+
+    if kind == "park" and count_buildings("hotel") > 0 and visitors == 0:
+        and_visitors()
+
+    if population >= 50 and size == 5:
+        size = 7
+        for row in grid:
+            row.extend([None, None])
+        grid.extend([[None for _ in range(size)] for _ in range(2)])
+        print("Your town reached 50 residents! The grid expanded to 7x7.")
+
+    def add_visitors():
+        global visitors
+        visitors = random.randint(3, 20)
+        print(f"{visitors} temporary visitors arrived. Materials are boosted 1.5x!")
+
+    def add_word(word)_
+        global 
